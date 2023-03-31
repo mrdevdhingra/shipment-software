@@ -118,7 +118,7 @@ const DataTable = () => {
     return sorted;
   }, [data, sortConfig]);
 
-  const DetailView = ({ data, onClose }) => {
+  const DetailView = ({ data, onClose, trackingInfo }) => {
 
     
   useEffect(() => {
@@ -155,16 +155,16 @@ const DataTable = () => {
             <p>
               <strong>Phone:</strong> {detailData.phone}
             </p>
-            {detailData.trackingInfo && (
-              <div>
-                <h3>Tracking Info:</h3>
-                {detailData.trackingInfo.map((info, index) => (
-                  <p key={index}>
-                    <strong>{info.carrier}:</strong> {info.trackingNumber}
-                  </p>
-                ))}
-              </div>
-            )}
+            {trackingInfo && (
+    <div>
+      <h3>Tracking Info:</h3>
+      {trackingInfo.map((info, index) => (
+        <p key={index}>
+          <strong>{info.carrier}:</strong> {info.trackingNumber}
+        </p>
+      ))}
+    </div>
+  )}
             <form onSubmit={handleTrackingFormSubmit}>
               {trackingInfo.map((info, index) => (
                 <div key={info.id} className="tracking-info">
@@ -523,7 +523,12 @@ const DataTable = () => {
         </div>
       )}
       {showDetail && (
-        <DetailView data={detailData} onClose={() => setShowDetail(false)} />
+        <DetailView
+        data={detailData}
+        onClose={() => setShowDetail(false)}
+        trackingInfo={trackingInfo}
+      />
+      
       )}
     </div>
   );
