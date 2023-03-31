@@ -17,6 +17,7 @@ const DataTable = () => {
   const [showDetail, setShowDetail] = useState(false);
   const [detailRow, setDetailRow] = useState(null);
   const [selectedInvoice, setSelectedInvoice] = useState("");
+  const [detailData, setDetailData] = useState(data);
   const [trackingInfo, setTrackingInfo] = useState([
     { carrier: "ANPOST", trackingNumber: "", id: 0 },
   ]);
@@ -95,7 +96,7 @@ const DataTable = () => {
   };
 
   const handleOpenClick = (rowData) => {
-    setDetailRow(rowData);
+    setDetailData(rowData);
     setShowDetail(true);
   };
 
@@ -126,7 +127,7 @@ const DataTable = () => {
 
   const DetailView = ({ data, onClose }) => {
 
-    const [detailData, setDetailData] = useState(data);
+    
   useEffect(() => {
     setDetailData(data);
   }, [data]);
@@ -529,7 +530,7 @@ const DataTable = () => {
         </div>
       )}
       {showDetail && (
-        <DetailView data={detailRow} onClose={() => setShowDetail(false)} />
+        <DetailView data={detailData} onClose={() => setShowDetail(false)} />
       )}
     </div>
   );
