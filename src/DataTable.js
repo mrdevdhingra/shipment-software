@@ -20,6 +20,7 @@ const DataTable = () => {
   const [trackingInfo, setTrackingInfo] = useState([
     { carrier: "ANPOST", trackingNumber: "", id: 0 },
   ]);
+  
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -124,8 +125,13 @@ const DataTable = () => {
   }, [data, sortConfig]);
 
   const DetailView = ({ data, onClose }) => {
+
+    const [detailData, setDetailData] = useState(data);
+  useEffect(() => {
+    setDetailData(data);
+  }, [data]);
     return (
-      <div className={`detail-view ${data ? "open" : ""}`}>
+      <div className={`detail-view ${detailData ? "open" : ""}`}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h2>User Details</h2>
           <button onClick={onClose} style={{ alignSelf: "flex-start" }}>
@@ -136,29 +142,29 @@ const DataTable = () => {
           <>
             <p>
               <strong>Invoice:</strong>{" "}
-              <span id="selectedInvoiceNumber">{data.invoiceNumber}</span>
+              <span id="selectedInvoiceNumber">{detailData.invoiceNumber}</span>
             </p>
             <p>
-              <strong>Name:</strong> {data.name}
+              <strong>Name:</strong> {detailData.name}
             </p>
             <p>
-              <strong>Email:</strong> {data.email}
+              <strong>Email:</strong> {detailData.email}
             </p>
             <p>
               <strong>Address:</strong>{" "}
-              {`${data.addressLine1}, ${
-                data.addressLine2 ? data.addressLine2 + "," : ""
-              } ${data.addressLine3 ? data.addressLine3 + "," : ""} ${
-                data.city
-              }, ${data.state}, ${data.country}`}
+              {`${detailData.addressLine1}, ${
+                detailData.addressLine2 ? detailData.addressLine2 + "," : ""
+              } ${detailData.addressLine3 ? detailData.addressLine3 + "," : ""} ${
+                detailData.city
+              }, ${detailData.state}, ${detailData.country}`}
             </p>
             <p>
-              <strong>Phone:</strong> {data.phone}
+              <strong>Phone:</strong> {detailData.phone}
             </p>
-            {data.trackingInfo && (
+            {detailData.trackingInfo && (
               <div>
                 <h3>Tracking Info:</h3>
-                {data.trackingInfo.map((info, index) => (
+                {detailData.trackingInfo.map((info, index) => (
                   <p key={index}>
                     <strong>{info.carrier}:</strong> {info.trackingNumber}
                   </p>
