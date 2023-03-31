@@ -534,6 +534,7 @@ const DataTable = () => {
         data={detailData}
         onClose={() => setShowDetail(false)}
         trackingInfo={trackingInfo}
+        key={detailData?.id} 
       />
       
       )}
