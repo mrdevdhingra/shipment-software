@@ -41,30 +41,22 @@ const DataTable = () => {
 
   useEffect(() => {
     if (selectedInvoice) {
-      // Set up the listener when the selectedInvoice is available
-      const unsubscribe = listenToTrackingInfoUpdates(selectedInvoice);
+      const customerRef = doc(collection(db, "customers"), selectedInvoice);
+  
+      const unsubscribe = onSnapshot(customerRef, (docSnapshot) => {
+        const data = docSnapshot.data();
+        const updatedTrackingInfo = data.trackingInfo || [];
+  
+        // Update your UI with the updated tracking info
+        // For example, if you're using React state:
+        setDetailData((prevData) => ({ ...prevData, trackingInfo: updatedTrackingInfo }));
+       
+      });
   
       // Clean up the listener when the component is unmounted or the selectedInvoice changes
       return () => unsubscribe();
     }
   }, [selectedInvoice]);
-  
-  const listenToTrackingInfoUpdates = (selectedInvoice) => {
-    const customerRef = doc(collection(db, "customers"), selectedInvoice);
-  
-    // Set up the listener
-    const unsubscribe = onSnapshot(customerRef, (docSnapshot) => {
-      const data = docSnapshot.data();
-      const updatedTrackingInfo = data.trackingInfo || [];
-  
-      // Update your UI with the updated tracking info
-      // For example, if you're using React state:
-      setDetailData((prevData) => ({ ...prevData, trackingInfo: updatedTrackingInfo }));
-    });
-  
-    // Return the unsubscribe function to allow cleanup when the component is unmounted
-    return unsubscribe;
-  };
   
 
   const handleSearch = (event) => {
