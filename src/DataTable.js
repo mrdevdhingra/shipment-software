@@ -76,6 +76,9 @@ const DataTable = () => {
     setSortConfig({ key, direction });
   };
 
+  
+  
+
   const handlePageClick = (newPage) => {
     setCurrentPage(newPage);
   };
@@ -158,7 +161,7 @@ const DataTable = () => {
   </div>
 )}
 
-            <form onSubmit={handleTrackingFormSubmit}>
+            <form onSubmit={(e) => handleTrackingFormSubmit(e, selectedInvoice)}>
               {trackingInfo.map((info, index) => (
                 <div key={info.id} className="tracking-info">
                   <select
@@ -192,7 +195,8 @@ const DataTable = () => {
               <button type="button" onClick={addTrackingInfo}>
                 Add
               </button>
-              <button type="submit">Send</button>
+              <button type="submit" onClick={(e) => handleTrackingFormSubmit(e, selectedInvoice)}
+> Send</button>
             </form>
           </>
         )}
@@ -251,13 +255,12 @@ const DataTable = () => {
     });
   };
 
-  const handleTrackingFormSubmit = async (e) => {
+  const handleTrackingFormSubmit = async (e, selectedInvoice) => {
     e.preventDefault();
-  
-    // Get the selected invoice number
-    const selectedInvoice = document.getElementById(
-      "selectedInvoiceNumber"
-    ).innerText;
+    if (!selectedInvoice) {
+      console.error("Selected invoice is not defined or empty");
+      return;
+    }
   
     // Update the Firestore document with the tracking info
     try {
@@ -281,6 +284,7 @@ const DataTable = () => {
       console.error("Error updating tracking info:", error);
     }
   };
+  
   
   
 
