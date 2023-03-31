@@ -1,0 +1,87 @@
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+  
+  .form {
+    width: 100%;
+    max-width: 600px;
+    background-color: #fff;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+  }
+  
+  .form h1 {
+    margin-top: 0;
+    margin-bottom: 30px;
+    text-align: left;
+    font-size: 35px;
+    font-weight: 300;
+  }
+  
+  .form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
+  }
+  
+  .form input {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    font-weight: 500;
+    color: #444;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .form button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #00b894;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in;
+  }
+  
+  .form button:hover {
+    background-color: #009a7a;
+  }
+  
+  .form select {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    font-weight: 500;
+    color: #444;
+    border-radius: 4px;
+    background-color: transparent;
+    transition: border-color 0.2s ease-in;
+    box-sizing: border-box;
+    appearance: none; /* Removes default arrow in some browsers */
+  }
+  
+  .form select:focus {
+    outline: none;
+    border-color: #00b894;
+  }
+  
