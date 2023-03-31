@@ -155,16 +155,17 @@ const DataTable = () => {
             <p>
               <strong>Phone:</strong> {detailData.phone}
             </p>
-            {trackingInfo && (
-    <div>
-      <h3>Tracking Info:</h3>
-      {trackingInfo.map((info, index) => (
-        <p key={index}>
-          <strong>{info.carrier}:</strong> {info.trackingNumber}
-        </p>
-      ))}
-    </div>
-  )}
+            {detailData.trackingInfo && (
+  <div>
+    <h3>Tracking Info:</h3>
+    {detailData.trackingInfo.map((info, index) => (
+      <p key={index}>
+        <strong>{info.carrier}:</strong> {info.trackingNumber}
+      </p>
+    ))}
+  </div>
+)}
+
             <form onSubmit={handleTrackingFormSubmit}>
               {trackingInfo.map((info, index) => (
                 <div key={info.id} className="tracking-info">
@@ -260,30 +261,36 @@ const DataTable = () => {
 
   const handleTrackingFormSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Get the selected invoice number
     const selectedInvoice = document.getElementById(
       "selectedInvoiceNumber"
     ).innerText;
-
+  
     // Update the Firestore document with the tracking info
     try {
       const customerRef = doc(collection(db, "customers"), selectedInvoice);
-
+  
       // Read the existing tracking info
       const customerDoc = await getDoc(customerRef);
       const existingTrackingInfo = customerDoc.data().trackingInfo || [];
-
+  
       // Merge existing and new tracking info
       const mergedTrackingInfo = [...existingTrackingInfo, ...trackingInfo];
-
+  
       // Update the document with the merged tracking info
       await updateDoc(customerRef, { trackingInfo: mergedTrackingInfo });
       console.log("Tracking info updated");
+  
+      // Reset the form trackingInfo state
+      setTrackingInfo([{ carrier: "ANPOST", trackingNumber: "", id: 0 }]);
+  
     } catch (error) {
       console.error("Error updating tracking info:", error);
     }
   };
+  
+  
 
   const filteredData = sortedData.filter((item) =>
     item.name
