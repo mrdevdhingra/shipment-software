@@ -21,7 +21,6 @@ const DataTable = () => {
   const [trackingInfo, setTrackingInfo] = useState([
     { carrier: "ANPOST", trackingNumber: "", id: 0 },
   ]);
-  
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -41,23 +40,26 @@ const DataTable = () => {
 
   useEffect(() => {
     if (selectedInvoice) {
+      console.log(selectedInvoice);
       const customerRef = doc(collection(db, "customers"), selectedInvoice);
-  
+
       const unsubscribe = onSnapshot(customerRef, (docSnapshot) => {
+        console.log("Snapshot updated");
         const data = docSnapshot.data();
         const updatedTrackingInfo = data.trackingInfo || [];
-  
+
         // Update your UI with the updated tracking info
         // For example, if you're using React state:
-        setDetailData((prevData) => ({ ...prevData, trackingInfo: updatedTrackingInfo }));
-       
+        setDetailData((prevData) => ({
+          ...prevData,
+          trackingInfo: updatedTrackingInfo,
+        }));
       });
-  
+
       // Clean up the listener when the component is unmounted or the selectedInvoice changes
       return () => unsubscribe();
     }
   }, [selectedInvoice]);
-  
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -76,8 +78,22 @@ const DataTable = () => {
     setSortConfig({ key, direction });
   };
 
-  
-  
+  const handleRefresh = async () => {
+    if (selectedInvoice) {
+      console.log(selectedInvoice);
+      const customerRef = doc(collection(db, "customers"), selectedInvoice);
+      console.log(customerRef); // Add this line
+      const docSnapshot = await getDoc(customerRef);
+      console.log(docSnapshot); // Add this line
+      const data = docSnapshot.data();
+      const updatedTrackingInfo = data.trackingInfo || [];
+
+      setDetailData((prevData) => ({
+        ...prevData,
+        trackingInfo: updatedTrackingInfo,
+      }));
+    }
+  };
 
   const handlePageClick = (newPage) => {
     setCurrentPage(newPage);
@@ -114,11 +130,9 @@ const DataTable = () => {
   }, [data, sortConfig]);
 
   const DetailView = ({ data, onClose, trackingInfo }) => {
-
-    
-  useEffect(() => {
-    setDetailData(data);
-  }, [data]);
+    useEffect(() => {
+      setDetailData(data);
+    }, [data]);
     return (
       <div className={`detail-view ${detailData ? "open" : ""}`}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -143,25 +157,25 @@ const DataTable = () => {
               <strong>Address:</strong>{" "}
               {`${detailData.addressLine1}, ${
                 detailData.addressLine2 ? detailData.addressLine2 + "," : ""
-              } ${detailData.addressLine3 ? detailData.addressLine3 + "," : ""} ${
-                detailData.city
-              }, ${detailData.state}, ${detailData.country}`}
+              } ${
+                detailData.addressLine3 ? detailData.addressLine3 + "," : ""
+              } ${detailData.city}, ${detailData.state}, ${detailData.country}`}
             </p>
             <p>
               <strong>Phone:</strong> {detailData.phone}
             </p>
             {detailData.trackingInfo && (
-  <div>
-    <h3>Tracking Info:</h3>
-    {detailData.trackingInfo.map((info, index) => (
-      <p key={index}>
-        <strong>{info.carrier}:</strong> {info.trackingNumber}
-      </p>
-    ))}
-  </div>
-)}
+              <div>
+                <h3>Tracking Info:</h3>
+                {detailData.trackingInfo.map((info, index) => (
+                  <p key={index}>
+                    <strong>{info.carrier}:</strong> {info.trackingNumber}
+                  </p>
+                ))}
+              </div>
+            )}
 
-            <form onSubmit={(e) => handleTrackingFormSubmit(e, selectedInvoice)}>
+            <form onSubmit={handleTrackingFormSubmit}>
               {trackingInfo.map((info, index) => (
                 <div key={info.id} className="tracking-info">
                   <select
@@ -195,12 +209,13 @@ const DataTable = () => {
               <button type="button" onClick={addTrackingInfo}>
                 Add
               </button>
-              <button type="submit" onClick={(e) => handleTrackingFormSubmit(e, selectedInvoice)}
-> Send</button>
+              <button type="submit" className="btn btn-primary">
+                Send
+              </button>
             </form>
           </>
         )}
-        <button onClick={onClose}>Close</button>
+        <button onClick={handleRefresh}>Refresh</button>
       </div>
     );
   };
@@ -255,38 +270,35 @@ const DataTable = () => {
     });
   };
 
-  const handleTrackingFormSubmit = async (e, selectedInvoice) => {
+  const handleTrackingFormSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedInvoice) {
-      console.error("Selected invoice is not defined or empty");
-      return;
-    }
-  
+
+    // Get the selected invoice number
+    const selectedInvoice = document.getElementById(
+      "selectedInvoiceNumber"
+    ).innerText;
+
     // Update the Firestore document with the tracking info
     try {
       const customerRef = doc(collection(db, "customers"), selectedInvoice);
-  
+
       // Read the existing tracking info
       const customerDoc = await getDoc(customerRef);
       const existingTrackingInfo = customerDoc.data().trackingInfo || [];
-  
+
       // Merge existing and new tracking info
       const mergedTrackingInfo = [...existingTrackingInfo, ...trackingInfo];
-  
+
       // Update the document with the merged tracking info
       await updateDoc(customerRef, { trackingInfo: mergedTrackingInfo });
       console.log("Tracking info updated");
-  
+
       // Reset the form trackingInfo state
       setTrackingInfo([{ carrier: "ANPOST", trackingNumber: "", id: 0 }]);
-  
     } catch (error) {
       console.error("Error updating tracking info:", error);
     }
   };
-  
-  
-  
 
   const filteredData = sortedData.filter((item) =>
     item.name
@@ -527,12 +539,11 @@ const DataTable = () => {
       )}
       {showDetail && (
         <DetailView
-        data={detailData}
-        onClose={() => setShowDetail(false)}
-        trackingInfo={trackingInfo}
-        key={detailData?.id} 
-      />
-      
+          data={detailData}
+          onClose={() => setShowDetail(false)}
+          trackingInfo={trackingInfo}
+          key={detailData?.id}
+        />
       )}
     </div>
   );
