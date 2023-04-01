@@ -5,6 +5,9 @@ import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import TrackingNumberInput from "./TrackingNumberInput";
 
+
+
+
 const DataTable = () => {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,10 +102,12 @@ const DataTable = () => {
     setCurrentPage(newPage);
   };
 
-  const handleOpenClick = (rowData) => {
-    setDetailData(rowData);
+  const handleOpenClick = (item) => {
+    setDetailData((prevData) => ({ ...prevData, ...item }));
+    setSelectedInvoice(item.invoiceNumber);
     setShowDetail(true);
   };
+  
 
   const handleEditClick = (rowData) => {
     setSelectedRow(rowData);
@@ -129,10 +134,23 @@ const DataTable = () => {
     return sorted;
   }, [data, sortConfig]);
 
-  const DetailView = ({ data, onClose, trackingInfo }) => {
+  const DetailView = ({ data, onClose, trackingInfo,handleRefresh, selectedInvoice,}) => {
     useEffect(() => {
       setDetailData(data);
-    }, [data]);
+    
+      if (selectedInvoice) {
+        const customerRef = doc(collection(db, "customers"), selectedInvoice);
+        const unsubscribe = onSnapshot(customerRef, (doc) => {
+          const updatedData = { ...data, trackingInfo: doc.data().trackingInfo };
+          setDetailData(updatedData);
+        });
+    
+        // Clean up the listener when the component is unmounted or the selectedInvoice changes
+        return () => {
+          unsubscribe();
+        };
+      }
+    }, [data, selectedInvoice]);
     return (
       <div className={`detail-view ${detailData ? "open" : ""}`}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -269,6 +287,8 @@ const DataTable = () => {
       return [...prevTrackingInfo];
     });
   };
+
+  //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
 
   const handleTrackingFormSubmit = async (e) => {
     e.preventDefault();
@@ -542,6 +562,8 @@ const DataTable = () => {
           data={detailData}
           onClose={() => setShowDetail(false)}
           trackingInfo={trackingInfo}
+          handleRefresh={handleRefresh}
+          selectedInvoice={selectedRow && selectedRow.invoiceNumber}
           key={detailData?.id}
         />
       )}
